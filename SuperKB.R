@@ -1,6 +1,6 @@
 library(mlr3verse)   # mlr3核心及常用扩展包
 library(data.table)  # 高效数据处理
-library(GH.AN.LIST) # 最新数据获取
+source("GH_AN_LIST.R") # 数据获取函数
 
 # ---------------------------
 # A：数据准备与任务创建
@@ -24,27 +24,32 @@ for (col in lag_cols) {
 # 移除第一行（因为滞后产生了NA）
 df_lagged <- na.omit(df_lagged)
 
-# 此时，特征变量是原始的DATES以及所有 *_lag1 变量
+# 此时，特征变量是所有 *_lag1 变量（排除DATES，因为ranger不支持Date类型）
 # 目标变量是原始的 KB1 到 KB20
-features <- c("DATES", paste0(lag_cols, "_lag1"))
+features <- paste0(lag_cols, "_lag1")
 targets <- paste0("KB", 1:20)
 
 # 为后续任务创建新的数据表
 model_data <- df_lagged[, c(features, targets), with = FALSE]
 
 # -------------------------
-# B：创建多输出回归任务
+# B：创建多个单输出回归任务
 # -------------------------
-# 在 mlr3中，通过 TaskRegr并指定多个 target来创建多输出回归任务。
-# 创建回归任务，指定多个目标变量
-task_multi_output <- TaskRegr$new(
-  id = "kb_multitarget",
-  backend = model_data,
-  target = targets # 指定KB1-KB20共20个目标变量
-)
+# mlr3的TaskRegr只支持单目标变量，需要为每个KB变量创建单独的任务
+
+# 为每个目标变量创建任务
+tasks <- list()
+for (target in targets) {
+  task <- TaskRegr$new(
+    id = paste0("kb_", target),
+    backend = model_data,
+    target = target
+  )
+  tasks[[target]] <- task
+}
 
 # 打印任务基本信息进行检查
-print(task_multi_output)
+print(paste("创建了", length(tasks), "个回归任务"))
 
 # -------------------------------------------------------
 # C：选择并配置学习器
@@ -65,23 +70,32 @@ learner_rf <- lrn("regr.ranger",
 # 设置随机种子保证可重复性
 set.seed(123)
 
-# 按比例（例如70%训练，30%测试）划分数据行索引
-train_rows <- sample(1:task_multi_output$nrow, size = 0.7 * task_multi_output$nrow)
-test_rows <- setdiff(1:task_multi_output$nrow, train_rows)
+# 获取数据行数
+nrow_data <- nrow(model_data)
 
-# 训练模型
-learner_rf$train(task_multi_output, row_ids = train_rows)
+# 按比例（例如70%训练，30%测试）划分数据行索引
+train_rows <- sample(1:nrow_data, size = 0.7 * nrow_data)
+test_rows <- setdiff(1:nrow_data, train_rows)
+
+# 为每个任务训练模型
+learners <- list()
+for (target in targets) {
+  cat(paste("正在训练", target, "模型...\n"))
+  learner <- lrn("regr.ranger",
+                  num.trees = 500,
+                  mtry = 5,
+                  importance = "impurity",
+                  predict_type = "response"
+  )
+  learner$train(tasks[[target]], row_ids = train_rows)
+  learners[[target]] <- learner
+}
+
+cat(paste("✓ 成功训练了", length(learners), "个模型\n"))
 
 # -------------------------------------------------------
 # E：进行预测并评估模型
 # -------------------------------------------------------
-# 1、对测试集进行预测
-# 在测试集上进行预测
-predictions <- learner_rf$predict(task_multi_output, row_ids = test_rows)
-
-# 2、评估模型性能
-# 对于多输出回归，常见的评估方式是为每个目标变量单独计算指标，
-# 或者计算所有目标变量的平均性能指标。
 # 定义要评估的指标列表
 measures <- list(
   msr("regr.mse"),  # 均方误差
@@ -89,14 +103,37 @@ measures <- list(
   msr("regr.rsq")   # 决定系数R²
 )
 
-# 计算预测结果在测试集上的各项指标
-# 为每个目标变量输出对应的指标值
-performance_score <- predictions$score(measures)
-print(performance_score)
+# 为每个目标变量进行预测和评估
+predictions <- list()
+performance_scores <- list()
 
-# 计算所有目标变量某个指标的平均值，例如平均MSE
-avg_mse <- mean(performance_score$regr.mse)
-print(paste("Average MSE across all KB targets:", avg_mse))
+for (target in targets) {
+  cat(paste("正在预测", target, "...\n"))
+  
+  # 在测试集上进行预测
+  pred <- learners[[target]]$predict(tasks[[target]], row_ids = test_rows)
+  predictions[[target]] <- pred
+  
+  # 计算预测结果在测试集上的各项指标
+  perf <- pred$score(measures)
+  performance_scores[[target]] <- perf
+  
+  cat(paste("  MSE:", round(perf$regr.mse, 4), 
+            "MAE:", round(perf$regr.mae, 4),
+            "R²:", round(perf$regr.rsq, 4), "\n"))
+}
+
+# 计算所有目标变量的平均性能指标
+avg_mse <- mean(sapply(performance_scores, function(x) x$regr.mse))
+avg_mae <- mean(sapply(performance_scores, function(x) x$regr.mae))
+avg_rsq <- mean(sapply(performance_scores, function(x) x$regr.rsq))
+
+cat("\n========================================\n")
+cat("平均性能指标:\n")
+cat(paste("  平均MSE:", round(avg_mse, 4), "\n"))
+cat(paste("  平均MAE:", round(avg_mae, 4), "\n"))
+cat(paste("  平均R²:", round(avg_rsq, 4), "\n"))
+cat("========================================\n")
 
 
 # -------------------------------------------------------
@@ -106,8 +143,8 @@ print(paste("Average MSE across all KB targets:", avg_mse))
 library(ggplot2)
 
 # 提取KB1的真实值和预测值
-true_kb1 <- predictions$truth$KB1
-pred_kb1 <- predictions$response$KB1
+true_kb1 <- predictions[["KB1"]]$truth
+pred_kb1 <- predictions[["KB1"]]$response
 plot_data <- data.frame(True = true_kb1, Predicted = pred_kb1)
 
 ggplot(plot_data, aes(x = True, y = Predicted)) +
@@ -122,8 +159,8 @@ ggplot(plot_data, aes(x = True, y = Predicted)) +
 # 检查变量重要性
 # 随机森林可以提供特征重要性度量。
 # 提取并绘制变量重要性 (需要学习器设置了importance = "impurity")
-if ("importance" %in% learner_rf$properties) {
-  imp <- learner_rf$importance()
+if ("importance" %in% learners[["KB1"]]$properties) {
+  imp <- learners[["KB1"]]$importance()
   # 将重要性排序并绘图
   imp_dt <- data.table(Feature = names(imp), Importance = imp)
   imp_dt <- imp_dt[order(-Importance)]

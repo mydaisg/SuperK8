@@ -2,7 +2,7 @@
 # 自动执行各赛道的最新更新及辨别逻辑
 ## 常量（各赛道开奖周几、开奖时间/
 ## 变量（当前周几时间
-## 判断（最后数据至今是否发生开奖活动
+## 判断（最后数据至今是否发生Open活动
 SK_CurrentTime <- Sys.time()
 SK_CurrentDay <- Sys.Date()
 SK_CurrentWeek <- 
