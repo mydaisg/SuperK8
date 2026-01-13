@@ -323,3 +323,73 @@ SPIDER_KB_Loop <- function(years = 5){
     failed_issues = failed_issues
   ))
 }
+
+SPIDER_KB_Once <- function(){
+  cat("========================================\n")
+  cat("一次性更新到最新期号\n")
+  cat("========================================\n\n")
+  
+  cat("步骤 1: 获取数据库最后一期数据...\n")
+  existing_issues <- SPIDER_KB_GetExistingIssues()
+  
+  if (length(existing_issues) == 0) {
+    cat("  数据库为空，从第一期开始爬取\n")
+    db_last_issue <- 0
+  } else {
+    db_last_issue <- max(existing_issues)
+    cat(paste("  数据库最后一期:", db_last_issue, "\n"))
+  }
+  
+  cat("\n步骤 2: 获取官网当前期号...\n")
+  current_data <- SPIDER_KB_Current()
+  current_issue <- as.numeric(current_data$KB_ISSUE)
+  cat(paste("  官网当前期号:", current_issue, "\n"))
+  
+  if (current_issue <= db_last_issue) {
+    cat("\n数据库已是最新，无需更新\n")
+    return(list(
+      success = 0,
+      skip = 0,
+      fail = 0,
+      message = "数据库已是最新"
+    ))
+  }
+  
+  cat("\n步骤 3: 爬取新期号...\n")
+  cat(paste("  需要爬取:", db_last_issue + 1, "至", current_issue, "\n\n"))
+  
+  success_count <- 0
+  fail_count <- 0
+  
+  for (issue in (db_last_issue + 1):current_issue) {
+    cat(paste("正在爬取期号:", issue, "\n"))
+    
+    kb_data <- SPIDER_KB_Issue(issue)
+    
+    if (!is.null(kb_data)) {
+      result <- SPIDER_KB_Insert(kb_data)
+      if (result > 0) {
+        success_count <- success_count + 1
+        cat(paste("  ✓ 期号", issue, "插入成功\n"))
+      }
+    } else {
+      fail_count <- fail_count + 1
+      cat(paste("  ✗ 期号", issue, "爬取失败\n"))
+    }
+    
+    Sys.sleep(REQUEST_DELAY)
+  }
+  
+  cat("\n========================================\n")
+  cat("更新完成统计:\n")
+  cat(paste("  成功插入:", success_count, "期\n"))
+  cat(paste("  失败:", fail_count, "期\n"))
+  cat("========================================\n")
+  
+  return(list(
+    success = success_count,
+    skip = 0,
+    fail = fail_count,
+    message = paste("成功更新", success_count, "期")
+  ))
+}

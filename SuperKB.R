@@ -6,15 +6,15 @@ source("GH_AN_LIST.R") # 数据获取函数
 # A：数据准备与任务创建
 # ---------------------------
 # 获取数据：数据 KB_Data。
-KB_Data <- GH_LIST_KB(4,30,6)
+KB_Data <- GH_LIST_KB(4, 100, 21)
 str(KB_Data) # 数据集的基本信息
 head(KB_Data)  # 前几行数据
 sum(is.na(KB_Data)) # 检查缺失值
 
-# 创建滞后特征，数据已按 DATES排序
-# 创建滞后变量：将KB1-KB20、POOL、ISSUE的值向后移动一期，作为t时刻的特征
+# 创建滞后特征，数据已按 ISSUE排序
+# 创建滞后变量：将KB1-KB20的值向后移动一期，作为t时刻的特征
 df_lagged <- copy(KB_Data)
-lag_cols <- c(paste0("KB", 1:20), "POOL", "ISSUE") # 需要创建滞后值的列
+lag_cols <- c(paste0("KB", 1:20), "ISSUE") # 需要创建滞后值的列
 
 # 对指定的列，每一列都创建一个滞后一期的列
 for (col in lag_cols) {
@@ -118,15 +118,15 @@ for (target in targets) {
   perf <- pred$score(measures)
   performance_scores[[target]] <- perf
   
-  cat(paste("  MSE:", round(perf$regr.mse, 4), 
-            "MAE:", round(perf$regr.mae, 4),
-            "R²:", round(perf$regr.rsq, 4), "\n"))
+  cat(paste("  MSE:", round(perf["regr.mse"], 4), 
+            "MAE:", round(perf["regr.mae"], 4),
+            "R²:", round(perf["regr.rsq"], 4), "\n"))
 }
 
 # 计算所有目标变量的平均性能指标
-avg_mse <- mean(sapply(performance_scores, function(x) x$regr.mse))
-avg_mae <- mean(sapply(performance_scores, function(x) x$regr.mae))
-avg_rsq <- mean(sapply(performance_scores, function(x) x$regr.rsq))
+avg_mse <- mean(sapply(performance_scores, function(x) x["regr.mse"]))
+avg_mae <- mean(sapply(performance_scores, function(x) x["regr.mae"]))
+avg_rsq <- mean(sapply(performance_scores, function(x) x["regr.rsq"]))
 
 cat("\n========================================\n")
 cat("平均性能指标:\n")
