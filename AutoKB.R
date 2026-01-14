@@ -246,7 +246,7 @@ cat("========================================\n")
 # ---------------------------
 # 步骤4: 保存预测结果到文件
 # ---------------------------
-cat("\n步骤 4: 保存预测结果到文件\n")
+cat("\n步骤 4: 保存Prediction Number结果到文件\n")
 cat("----------------------------------------\n")
 
 # 确保NextKB目录存在
@@ -362,4 +362,4 @@ file_content <- paste0(file_content, "========================================\n
 
 # 写入文件
 writeLines(file_content, filename)
-cat(paste("✓ 预测结果已保存到:", filename, "\n"))
+cat(paste("✓ Prediction Number结果已保存到:", filename, "\n"))

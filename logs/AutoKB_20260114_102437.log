@@ -1,0 +1,19 @@
+[2026-01-14 10:24:38] ========================================
+[2026-01-14 10:24:38] AutoKB Automation Script Started
+[2026-01-14 10:24:38] ========================================
+[2026-01-14 10:24:38] Working directory: D:\GitHub\SuperK8
+[2026-01-14 10:24:38] 
+[2026-01-14 10:24:38] Step 1: Running AutoKB.R
+[2026-01-14 10:24:38] ----------------------------------------
+[2026-01-14 10:24:38] Rscript path: D:\Program Files\R\R-4.5.2\bin\Rscript.exe
+[2026-01-14 10:24:38] Starting AutoKB.R execution...
+[2026-01-14 10:24:47] AutoKB.R executed successfully
+[2026-01-14 10:24:47] 
+[2026-01-14 10:24:47] Step 2: Git operations
+[2026-01-14 10:24:47] ----------------------------------------
+[2026-01-14 10:24:47] Checking Git status...
+[2026-01-14 10:24:47] Changes detected, starting Git operations...
+[2026-01-14 10:24:47] Executing git add .
+[2026-01-14 10:24:47] Error: warning: in the working copy of 'run_autokb.bat', LF will be replaced by CRLF the next time Git touches it
+[2026-01-14 10:24:47] Stack trace: at Main, D:\GitHub\SuperK8\run_autokb.ps1: line 81
+at <ScriptBlock>, D:\GitHub\SuperK8\run_autokb.ps1: line 107
