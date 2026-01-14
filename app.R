@@ -5,7 +5,7 @@ library(data.table)
 library(DT)
 
 ui <- dashboardPage(
-  dashboardHeader(title = "SuperK8 - Lottery Prediction System"),
+  dashboardHeader(title = "SuperK8 - Prediction System"),
   
   dashboardSidebar(
     sidebarMenu(
