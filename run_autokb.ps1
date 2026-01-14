@@ -67,35 +67,15 @@ function Main {
         Write-Log "Step 2: Git operations"
         Write-Log "----------------------------------------"
         
-        # Check for changes
-        Write-Log "Checking Git status..."
-        $GitStatus = git status --porcelain
+        # Run git auto commit script
+        Write-Log "Running git_auto_commit.ps1..."
+        $GitCommitMessage = "AutoKB update - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        $GitProcess = Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"git_auto_commit.ps1`" -CommitMessage `"$GitCommitMessage`"" -Wait -PassThru -NoNewWindow
         
-        if ([string]::IsNullOrEmpty($GitStatus)) {
-            Write-Log "No new changes, skipping Git operations"
+        if ($GitProcess.ExitCode -eq 0) {
+            Write-Log "Git operations completed successfully"
         } else {
-            Write-Log "Changes detected, starting Git operations..."
-            
-            # Add all changes
-            Write-Log "Executing git add ."
-            git add . 2>&1 | Where-Object { $_ -notmatch "^warning:" } | ForEach-Object { Write-Log $_ }
-            
-            # Commit changes
-            $CommitMessage = "AutoKB update - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-            Write-Log "Executing git commit -m `"$CommitMessage`""
-            $CommitResult = git commit -m $CommitMessage 2>&1
-            $CommitResult | Where-Object { $_ -notmatch "^warning:" } | ForEach-Object { Write-Log $_ }
-            
-            # Check if commit was successful
-            if ($LASTEXITCODE -eq 0) {
-                # Push to remote repository
-                Write-Log "Executing git push"
-                git push 2>&1 | Where-Object { $_ -notmatch "^warning:" } | ForEach-Object { Write-Log $_ }
-                
-                Write-Log "Git operations completed"
-            } else {
-                Write-Log "Git commit failed or nothing to commit"
-            }
+            Write-Log "Git operations failed, exit code: $($GitProcess.ExitCode)"
         }
         
         Write-Log ""
