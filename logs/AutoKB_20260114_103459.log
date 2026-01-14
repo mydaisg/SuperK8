@@ -1,0 +1,19 @@
+[2026-01-14 10:34:59] ========================================
+[2026-01-14 10:34:59] AutoKB Automation Script Started
+[2026-01-14 10:34:59] ========================================
+[2026-01-14 10:34:59] Working directory: D:\GitHub\SuperK8
+[2026-01-14 10:34:59] 
+[2026-01-14 10:34:59] Step 1: Running AutoKB.R
+[2026-01-14 10:34:59] ----------------------------------------
+[2026-01-14 10:34:59] Rscript path: D:\Program Files\R\R-4.5.2\bin\Rscript.exe
+[2026-01-14 10:34:59] Starting AutoKB.R execution...
+[2026-01-14 10:35:07] AutoKB.R executed successfully
+[2026-01-14 10:35:07] 
+[2026-01-14 10:35:07] Step 2: Git operations
+[2026-01-14 10:35:07] ----------------------------------------
+[2026-01-14 10:35:07] Checking Git status...
+[2026-01-14 10:35:07] Changes detected, starting Git operations...
+[2026-01-14 10:35:07] Executing git add .
+[2026-01-14 10:35:08] Error: warning: in the working copy of 'TASK_SCHEDULER_SETUP.md', LF will be replaced by CRLF the next time Git touches it
+[2026-01-14 10:35:08] Stack trace: 在 Main、D:\GitHub\SuperK8\run_autokb.ps1 中: 第 81 行
+在 <ScriptBlock>、D:\GitHub\SuperK8\run_autokb.ps1 中: 第 113 行
