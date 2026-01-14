@@ -87,7 +87,7 @@ cat("✓ 模型训练完成\n\n")
 # ---------------------------
 # 步骤3: Prediction下一期号码
 # ---------------------------
-cat("步骤 3: Prediction下一期号码\n")
+cat("步骤 3: Prediction NextIssue Number\n")
 cat("----------------------------------------\n")
 
 # 获取最新一期的数据作为Prediction输入
@@ -95,7 +95,7 @@ latest_data <- KB_Data[nrow(KB_Data), ]
 current_issue <- latest_data$ISSUE
 next_issue <- current_issue + 1
 
-cat(paste("当前Issue:", current_issue, "\n"))
+cat(paste("Current Issue:", current_issue, "\n"))
 cat(paste("Prediction Issue:", next_issue, "\n\n"))
 
 # 创建预测特征（使用最新一期的滞后值）
@@ -158,7 +158,7 @@ pred_dt_sorted <- pred_dt[order(-R2_Score)]
 # 选择前11个Prediction效果最好的号码
 top_predictions <- pred_dt_sorted[1:11]
 
-cat("Prediction效果最好的11个号码（按R²值排序）:\n")
+cat("Prediction Top11 Number（按R²值排序）:\n")
 cat("----------------------------------------\n")
 for (i in 1:nrow(top_predictions)) {
   cat(sprintf("%2d. %s: %2d  (R²=%.4f)\n", 
@@ -170,7 +170,7 @@ for (i in 1:nrow(top_predictions)) {
 cat("----------------------------------------\n\n")
 
 # 按Prediction号码大小排序
-cat("按Prediction号码大小排序:\n")
+cat("Prediction Sort Number:\n")
 cat("----------------------------------------\n")
 pred_by_number <- top_predictions[order(Predicted_Number)]
 for (i in 1:nrow(pred_by_number)) {
@@ -184,7 +184,7 @@ cat("----------------------------------------\n\n")
 
 # 单独列出Top11，便于复制
 cat("========================================\n")
-cat("Top11 Prediction号码（便于复制）\n")
+cat("Top11 Prediction Number（便于复制）\n")
 cat("========================================\n")
 cat("按R²值排序:\n")
 for (i in 1:nrow(top_predictions)) {
@@ -200,7 +200,7 @@ for (i in 1:nrow(top_predictions)) {
 }
 cat("\n\n")
 
-cat("按号码大小排序:\n")
+cat("Sort Number:\n")
 sorted_numbers <- sort(as.integer(top_predictions$Predicted_Number))
 for (i in 1:length(sorted_numbers)) {
   cat(sprintf("%d", sorted_numbers[i]))
@@ -215,9 +215,9 @@ cat("\n")
 cat("========================================\n\n")
 
 # 显示所有20个Prediction结果
-cat("所有20个位置的Prediction结果:\n")
+cat("所有20个位置的Prediction Number:\n")
 cat("----------------------------------------\n")
-cat(sprintf("%-8s %6s %10s\n", "KB位置", "Prediction号码", "R²值"))
+cat(sprintf("%-8s %6s %10s\n", "KB_Position", "NextNumber", "R²值"))
 cat("----------------------------------------\n")
 for (i in 1:nrow(pred_dt_sorted)) {
   cat(sprintf("%-8s %6d %10.4f\n", 
@@ -230,12 +230,12 @@ cat("----------------------------------------\n\n")
 # 统计信息
 cat("Prediction统计:\n")
 cat("----------------------------------------\n")
-cat(sprintf("Prediction号码范围: %d - %d\n", 
+cat(sprintf("Prediction Number范围: %d - %d\n", 
             min(as.integer(top_predictions$Predicted_Number)), 
             max(as.integer(top_predictions$Predicted_Number))))
-cat(sprintf("Prediction号码平均值: %.2f\n", 
+cat(sprintf("Prediction Number平均值: %.2f\n", 
             mean(top_predictions$Predicted_Number)))
-cat(sprintf("Prediction号码中位数: %d\n", 
+cat(sprintf("Prediction Number中位数: %d\n", 
             as.integer(median(top_predictions$Predicted_Number))))
 cat("----------------------------------------\n")
 
@@ -272,11 +272,11 @@ file_content <- paste0(file_content, "========================================\n
 file_content <- paste0(file_content, "AutoKB Prediction结果\n")
 file_content <- paste0(file_content, "========================================\n\n")
 
-file_content <- paste0(file_content, "当前Issue: ", current_issue, "\n")
+file_content <- paste0(file_content, "Current Issue: ", current_issue, "\n")
 file_content <- paste0(file_content, "Prediction Issue: ", next_issue, "\n\n")
 
 file_content <- paste0(file_content, "========================================\n")
-file_content <- paste0(file_content, "Top11 Prediction号码（便于复制）\n")
+file_content <- paste0(file_content, "Top11 Prediction Number（便于复制）\n")
 file_content <- paste0(file_content, "========================================\n\n")
 
 file_content <- paste0(file_content, "按R²值排序:\n")
@@ -293,7 +293,7 @@ for (i in 1:nrow(top_predictions)) {
 }
 file_content <- paste0(file_content, "\n\n")
 
-file_content <- paste0(file_content, "按号码大小排序:\n")
+file_content <- paste0(file_content, "Sort Number:\n")
 sorted_numbers <- sort(as.integer(top_predictions$Predicted_Number))
 for (i in 1:length(sorted_numbers)) {
   file_content <- paste0(file_content, sprintf("%d", sorted_numbers[i]))
@@ -307,7 +307,7 @@ for (i in 1:length(sorted_numbers)) {
 file_content <- paste0(file_content, "\n\n")
 
 file_content <- paste0(file_content, "========================================\n")
-file_content <- paste0(file_content, "Prediction效果最好的11个号码（按R²值排序）\n")
+file_content <- paste0(file_content, "Top11 Prediction Number（按R²值排序）\n")
 file_content <- paste0(file_content, "========================================\n")
 for (i in 1:nrow(top_predictions)) {
   file_content <- paste0(file_content, sprintf("%2d. %s: %2d  (R²=%.4f)\n", 
@@ -319,7 +319,7 @@ for (i in 1:nrow(top_predictions)) {
 file_content <- paste0(file_content, "\n")
 
 file_content <- paste0(file_content, "========================================\n")
-file_content <- paste0(file_content, "按Prediction号码大小排序\n")
+file_content <- paste0(file_content, "Sort Number:\n")
 file_content <- paste0(file_content, "========================================\n")
 pred_by_number <- top_predictions[order(Predicted_Number)]
 for (i in 1:nrow(pred_by_number)) {
@@ -332,9 +332,9 @@ for (i in 1:nrow(pred_by_number)) {
 file_content <- paste0(file_content, "\n")
 
 file_content <- paste0(file_content, "========================================\n")
-file_content <- paste0(file_content, "所有20个位置的Prediction结果\n")
+file_content <- paste0(file_content, "所有20个位置的Prediction Number结果\n")
 file_content <- paste0(file_content, "========================================\n")
-file_content <- paste0(file_content, sprintf("%-8s %6s %10s\n", "KB位置", "Prediction号码", "R²值"))
+file_content <- paste0(file_content, sprintf("%-8s %6s %10s\n", "KB位置", "Prediction Number", "R²值"))
 file_content <- paste0(file_content, "----------------------------------------\n")
 for (i in 1:nrow(pred_dt_sorted)) {
   file_content <- paste0(file_content, sprintf("%-8s %6d %10.4f\n", 
@@ -347,12 +347,12 @@ file_content <- paste0(file_content, "\n")
 file_content <- paste0(file_content, "========================================\n")
 file_content <- paste0(file_content, "Prediction统计\n")
 file_content <- paste0(file_content, "========================================\n")
-file_content <- paste0(file_content, sprintf("Prediction号码范围: %d - %d\n", 
+file_content <- paste0(file_content, sprintf("Prediction Number范围: %d - %d\n", 
             min(as.integer(top_predictions$Predicted_Number)), 
             max(as.integer(top_predictions$Predicted_Number))))
-file_content <- paste0(file_content, sprintf("Prediction号码平均值: %.2f\n", 
+file_content <- paste0(file_content, sprintf("Prediction Number平均值: %.2f\n", 
             mean(top_predictions$Predicted_Number)))
-file_content <- paste0(file_content, sprintf("Prediction号码中位数: %d\n", 
+file_content <- paste0(file_content, sprintf("Prediction Number中位数: %d\n", 
             as.integer(median(top_predictions$Predicted_Number))))
 file_content <- paste0(file_content, "\n")
 
