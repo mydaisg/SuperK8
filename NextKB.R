@@ -61,7 +61,7 @@ cat("✓ 模型准备完成\n\n")
 # 预测下一期号码
 # ---------------------------
 cat("========================================\n")
-cat("预测下一期号码\n")
+cat("预测NextIssue\n")
 cat("========================================\n\n")
 
 # 获取最新一期的数据作为预测输入
@@ -69,8 +69,8 @@ latest_data <- KB_Data[nrow(KB_Data), ]  # 最后一行是最新的数据
 current_issue <- latest_data$ISSUE
 next_issue <- current_issue + 1
 
-cat(paste("当前期号:", current_issue, "\n"))
-cat(paste("预测期号:", next_issue, "\n\n"))
+cat(paste("Current Issue:", current_issue, "\n"))
+cat(paste("Next Issue:", next_issue, "\n\n"))
 
 # 创建预测特征（使用最新一期的滞后值）
 prediction_features <- data.table()
@@ -133,7 +133,7 @@ pred_dt_sorted <- pred_dt[order(-R2_Score)]
 # 选择前11个预测效果最好的号码
 top_predictions <- pred_dt_sorted[1:11]
 
-cat("预测效果最好的11个号码（按R²值排序）:\n")
+cat("预测效果Top11（按R²值排序）:\n")
 cat("----------------------------------------\n")
 for (i in 1:nrow(top_predictions)) {
   cat(sprintf("%2d. %s: %2d  (R²=%.4f)\n", 
@@ -145,7 +145,7 @@ for (i in 1:nrow(top_predictions)) {
 cat("----------------------------------------\n\n")
 
 # 按预测号码大小排序
-cat("按预测号码大小排序:\n")
+cat("按预测Sort Number:\n")
 cat("----------------------------------------\n")
 pred_by_number <- top_predictions[order(Predicted_Number)]
 for (i in 1:nrow(pred_by_number)) {
@@ -160,7 +160,7 @@ cat("----------------------------------------\n\n")
 # 显示所有20个预测结果
 cat("所有20个位置的预测结果:\n")
 cat("----------------------------------------\n")
-cat(sprintf("%-8s %6s %10s\n", "KB位置", "预测号码", "R²值"))
+cat(sprintf("%-8s %6s %10s\n", "KB_Position", "NextNumber", "R²值"))
 cat("----------------------------------------\n")
 for (i in 1:nrow(pred_dt_sorted)) {
   cat(sprintf("%-8s %6d %10.4f\n", 

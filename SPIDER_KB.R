@@ -56,7 +56,7 @@ SPIDER_KB_Current <- function(){
   cat(paste("期号:", K8_Matched$KB_ISSUE, "\n"))
   cat(paste("日期:", K8_Matched$KB_DATE, "\n"))
   cat(paste("销量:", K8_Matched$KB_SALES, "\n"))
-  cat(paste("奖池:", K8_Matched$KB_POOL, "\n"))
+  #cat(paste("奖池:", K8_Matched$KB_POOL, "\n"))
   
   return(K8_Matched)
 }
