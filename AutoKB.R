@@ -363,3 +363,14 @@ file_content <- paste0(file_content, "========================================\n
 # 写入文件
 writeLines(file_content, filename)
 cat(paste("✓ Prediction Number结果已保存到:", filename, "\n"))
+
+# ---------------------------
+# 步骤5: Git自动提交和推送
+# ---------------------------
+cat("\n步骤 5: Git自动提交和推送\n")
+cat("----------------------------------------\n")
+
+commit_msg <- paste0("AutoKB update - ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"))
+system(paste0('powershell.exe -ExecutionPolicy Bypass -File "git_auto_commit.ps1" -CommitMessage "', commit_msg, '"'), ignore.stdout = TRUE, ignore.stderr = TRUE)
+
+cat("✓ Git操作完成\n")
